@@ -56,6 +56,20 @@ services:
     networks:
       - supportdesk-network
 
+  # React 18 + Vite Management Dashboard Frontend
+  support-desk-ui:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: support-desk-ui
+    ports:
+      - "3000:80"
+    depends_on:
+      - support-desk-api
+    networks:
+      - supportdesk-network
+    restart: unless-stopped
+
 networks:
   supportdesk-network:
     driver: bridge

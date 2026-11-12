@@ -77,7 +77,7 @@ flowchart TD
 | **API & Documentation** | Spring Web MVC, SpringDoc OpenAPI 3, Swagger UI (`/swagger-ui.html`) |
 | **Testing** | JUnit 5, Mockito, AssertJ, SpringBootTest, MockMvc |
 | **DevOps & Containerization** | Docker (Multi-stage build), Docker Compose, GitHub Actions CI Pipeline |
-| **Frontend Dashboard** | HTML5, Tailwind CSS, JavaScript (Vanilla ES6+), FontAwesome |
+| **Frontend Architecture** | React 18, Vite 5, Tailwind CSS, Lucide React, Nginx Reverse Proxy |
 
 ---
 
@@ -94,16 +94,26 @@ Clone the repository and run:
 ./mvnw clean spring-boot:run
 ```
 The application will start on **`http://localhost:8080`**.
-- **Management Dashboard:** [http://localhost:8080/](http://localhost:8080/)
+- **Management Dashboard:** [http://localhost:8080/](http://localhost:8080/) *(Pre-bundled React 18 SPA served directly by Spring Boot)*
 - **Swagger OpenAPI Documentation:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **H2 Database Console:** [http://localhost:8080/h2-console](http://localhost:8080/h2-console) *(JDBC URL: `jdbc:h2:mem:supportdeskdb`, User: `sa`, Password: empty)*
 
-### Option B: Docker Compose (Spring Boot + PostgreSQL + MailHog)
+### Option B: Frontend Hot-Reload Development (Vite Dev Server)
+To work on the React UI with instant Hot Module Replacement (HMR):
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Runs the Vite development server on **`http://localhost:3000`** with automatic reverse proxy to `http://localhost:8080/api`.
+
+### Option C: Docker Compose (Spring Boot + PostgreSQL + MailHog + React UI)
 ```bash
 docker compose up --build
 ```
 Services spun up:
-- **Support Desk API & UI:** `http://localhost:8080`
+- **Support Desk React UI:** `http://localhost:3000`
+- **Support Desk Backend API:** `http://localhost:8080`
 - **PostgreSQL Database:** `localhost:5432`
 - **MailHog Web Mailbox:** `http://localhost:8025` *(view all dispatched test emails)*
 
