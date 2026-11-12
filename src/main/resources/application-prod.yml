@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:supportdesk}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:supportuser}
+    password: ${DB_PASSWORD:supportpass}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: false
+
+server:
+  port: 8080
