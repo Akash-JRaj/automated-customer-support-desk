@@ -1,7 +1,20 @@
 import React from 'react';
-import { Headset, BookOpen, Send, UserCheck } from 'lucide-react';
+import { Headset, BookOpen, Send, UserCheck, Shield } from 'lucide-react';
 
-export default function Navbar({ onOpenSimulate, role, onRoleChange }) {
+export default function Navbar({ onOpenSimulate, role, currentUser, onRoleChange }) {
+  const getRoleLabel = (r) => {
+    switch (r) {
+      case 'ROLE_ADMIN':
+        return 'Admin';
+      case 'ROLE_AGENT':
+        return 'Support Agent';
+      case 'ROLE_CUSTOMER':
+        return 'Customer';
+      default:
+        return r;
+    }
+  };
+
   return (
     <nav className="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,16 +50,21 @@ export default function Navbar({ onOpenSimulate, role, onRoleChange }) {
               <Send className="w-3.5 h-3.5" /> Simulate Inbound Email
             </button>
 
-            <div className="flex items-center bg-indigo-950 px-2.5 py-1 rounded-lg border border-indigo-800">
-              <UserCheck className="w-3.5 h-3.5 text-indigo-400 mr-1.5" />
+            {/* Authenticated Role Selector */}
+            <div className="flex items-center bg-indigo-950 px-2.5 py-1.5 rounded-lg border border-indigo-800 space-x-2">
+              <Shield className="w-3.5 h-3.5 text-indigo-400" />
+              <div className="flex flex-col text-[10px] leading-tight text-right mr-1 hidden sm:flex">
+                <span className="text-slate-300 font-semibold">{currentUser?.fullName || getRoleLabel(role)}</span>
+                <span className="text-emerald-400">Authenticated (JWT)</span>
+              </div>
               <select
                 value={role}
                 onChange={(e) => onRoleChange(e.target.value)}
-                className="bg-transparent text-white font-medium focus:outline-none cursor-pointer"
+                className="bg-indigo-900 text-white font-semibold rounded px-2 py-1 text-xs focus:outline-none cursor-pointer border border-indigo-700"
               >
-                <option value="ROLE_ADMIN" className="bg-slate-900">Admin (Akash)</option>
-                <option value="ROLE_AGENT" className="bg-slate-900">Support Agent (Sarah)</option>
-                <option value="ROLE_CUSTOMER" className="bg-slate-900">Customer (Read-Only)</option>
+                <option value="ROLE_ADMIN">Admin (Akash)</option>
+                <option value="ROLE_AGENT">Support Agent (Sarah)</option>
+                <option value="ROLE_CUSTOMER">Customer (David)</option>
               </select>
             </div>
           </div>

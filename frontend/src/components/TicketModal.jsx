@@ -1,36 +1,50 @@
 import React, { useState } from 'react';
-import { X, Bot, User, Cpu, Sparkles, Send, ArrowUpRight } from 'lucide-react';
+import { X, Bot, User, Cpu, Sparkles, Send, ArrowUpRight, ShieldAlert } from 'lucide-react';
 
-export default function TicketModal({ ticket, onClose, onRefresh }) {
+export default function TicketModal({ ticket, role, authFetch, onClose, onRefresh }) {
   const [replyText, setReplyText] = useState('');
   const [resolveTicket, setResolveTicket] = useState(true);
   const [loading, setLoading] = useState(false);
 
   if (!ticket) return null;
 
+  const isCustomerRole = role === 'ROLE_CUSTOMER';
+
   const handleApproveDraft = async () => {
+    if (isCustomerRole) {
+      alert('Action Restricted: You are currently viewing as "Customer (Read-Only)". Please switch role to "Admin" or "Support Agent" in the top navbar to approve AI drafts.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/tickets/${ticket.id}/approve-draft`, { method: 'POST' });
+      const res = await authFetch(`/api/v1/tickets/${ticket.id}/approve-draft`, { method: 'POST' });
       if (res.ok) {
         alert('AI Draft approved and dispatched to customer email!');
         onRefresh();
         onClose();
       } else {
-        alert('Failed to approve draft (requires ROLE_AGENT or ROLE_ADMIN)');
+        const errorText = await res.text();
+        alert(`Failed to approve draft (${res.status}): ${errorText || 'Unauthorized or Forbidden'}`);
       }
     } catch (err) {
       console.error(err);
+      alert('Network error while approving draft');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSendReply = async () => {
+    if (isCustomerRole) {
+      alert('Action Restricted: Switch role to "Admin" or "Support Agent" in the navbar to send replies.');
+      return;
+    }
     if (!replyText.trim()) return alert('Please enter reply text');
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/tickets/${ticket.id}/reply`, {
+      const res = await authFetch(`/api/v1/tickets/${ticket.id}/reply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: replyText, resolveTicket })
@@ -40,30 +54,40 @@ export default function TicketModal({ ticket, onClose, onRefresh }) {
         onRefresh();
         onClose();
       } else {
-        alert('Failed to send reply');
+        const errorText = await res.text();
+        alert(`Failed to send reply (${res.status}): ${errorText || 'Unauthorized or Forbidden'}`);
       }
     } catch (err) {
       console.error(err);
+      alert('Network error while sending reply');
     } finally {
       setLoading(false);
     }
   };
 
   const handleEscalate = async () => {
+    if (isCustomerRole) {
+      alert('Action Restricted: Switch role to "Admin" or "Support Agent" in the navbar to escalate.');
+      return;
+    }
     const reason = prompt('Enter escalation reason:', 'Manually escalated for tier-2 specialist review');
     if (!reason) return;
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/tickets/${ticket.id}/escalate?reason=${encodeURIComponent(reason)}`, {
+      const res = await authFetch(`/api/v1/tickets/${ticket.id}/escalate?reason=${encodeURIComponent(reason)}`, {
         method: 'POST'
       });
       if (res.ok) {
         alert('Ticket escalated to Tier-2 specialist!');
         onRefresh();
         onClose();
+      } else {
+        alert('Failed to escalate ticket');
       }
     } catch (err) {
       console.error(err);
+      alert('Network error while escalating');
     } finally {
       setLoading(false);
     }
@@ -84,6 +108,11 @@ export default function TicketModal({ ticket, onClose, onRefresh }) {
             <span className="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800 border border-indigo-200">
               {ticket.handlingType === 'AI_HANDLED' ? 'AI-Handled' : 'Human Escalated'}
             </span>
+            {isCustomerRole && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
+                <ShieldAlert className="w-3 h-3 text-amber-600" /> Read-Only Role
+              </span>
+            )}
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
             <X className="w-5 h-5" />
