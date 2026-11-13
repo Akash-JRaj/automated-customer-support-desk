@@ -94,17 +94,20 @@ export default function App() {
 
   const fetchTickets = useCallback(async () => {
     try {
-      let url = `/api/v1/tickets?size=50`;
-      if (filters.status) url += `&status=${filters.status}`;
-      if (filters.urgency) url += `&urgency=${filters.urgency}`;
-      if (filters.category) url += `&category=${filters.category}`;
-      if (filters.handlingType) url += `&handlingType=${filters.handlingType}`;
-      if (filters.search) url += `&search=${encodeURIComponent(filters.search)}`;
+      const params = new URLSearchParams();
+      params.append('size', '50');
+      if (filters.status) params.append('status', filters.status);
+      if (filters.urgency) params.append('urgency', filters.urgency);
+      if (filters.category) params.append('category', filters.category);
+      if (filters.handlingType) params.append('handlingType', filters.handlingType);
+      if (filters.search && filters.search.trim()) params.append('search', filters.search.trim());
 
-      const res = await authFetch(url);
+      const res = await authFetch(`/api/v1/tickets?${params.toString()}`);
       if (res.ok) {
         const page = await res.json();
         setTickets(page.content || []);
+      } else {
+        console.error('Failed to fetch tickets:', res.status);
       }
     } catch (err) {
       console.error('Failed to fetch tickets:', err);

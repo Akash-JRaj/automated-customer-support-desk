@@ -38,6 +38,25 @@ class TicketControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("GET /api/v1/tickets with filters - should filter by status and category without SQL error")
+    void testGetTicketsWithFilters() throws Exception {
+        mockMvc.perform(get("/api/v1/tickets")
+                        .param("status", "RESOLVED")
+                        .param("category", "BILLING"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", notNullValue()));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/tickets with handlingType - should filter AI_HANDLED vs HUMAN_ESCALATED")
+    void testGetTicketsWithHandlingType() throws Exception {
+        mockMvc.perform(get("/api/v1/tickets")
+                        .param("handlingType", "HUMAN_ESCALATED"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", notNullValue()));
+    }
+
+    @Test
     @DisplayName("GET /api/v1/dashboard/metrics - should return metrics")
     void testGetDashboardMetrics() throws Exception {
         mockMvc.perform(get("/api/v1/dashboard/metrics"))

@@ -73,9 +73,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/emails/**").permitAll()
                         // Dashboard & Ticket APIs
-                        .requestMatchers(HttpMethod.GET, "/api/v1/dashboard/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/tickets/**").permitAll()
-                        .requestMatchers("/api/v1/tickets/**").hasAnyAuthority("ROLE_AGENT", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/dashboard", "/api/v1/dashboard/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tickets", "/api/v1/tickets/**").permitAll()
+                        .requestMatchers("/api/v1/tickets", "/api/v1/tickets/**").hasAnyAuthority("ROLE_AGENT", "ROLE_ADMIN")
                         .anyRequest().authenticated()
                 );
 
