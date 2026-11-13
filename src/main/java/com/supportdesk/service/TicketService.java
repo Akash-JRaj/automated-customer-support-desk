@@ -13,6 +13,7 @@ import com.supportdesk.model.enums.TicketStatus;
 import com.supportdesk.model.enums.Urgency;
 import com.supportdesk.repository.TicketMessageRepository;
 import com.supportdesk.repository.TicketRepository;
+import com.supportdesk.repository.TicketSpecification;
 import com.supportdesk.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,8 @@ public class TicketService {
                                                         HandlingType handlingType,
                                                         String search,
                                                         Pageable pageable) {
-        Page<Ticket> page = ticketRepository.findWithFilters(status, urgency, category, handlingType, search, pageable);
+        var spec = TicketSpecification.withFilters(status, urgency, category, handlingType, search);
+        Page<Ticket> page = ticketRepository.findAll(spec, pageable);
         return page.map(emailIngestionService::mapToDto);
     }
 
